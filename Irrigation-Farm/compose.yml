@@ -1,0 +1,44 @@
+version: '3.6'
+services:
+  webserver:
+    container_name: ${INSTANCE_CONTAINER_WEBNAME}
+    image: creativecod3.azurecr.io/blazorapppostgresql:latest
+    environment:
+      - SQLCONNECTION=${POSTGRES_CONNECTION}
+    ports:
+      - "${WEB_PORT}:80"
+    networks: 
+      - internal
+      - default
+    restart: always
+  grafana:
+    image: grafana/grafana-oss
+    container_name: ${INSTANCE_CONTAINER_GRAFNAME}
+    ports:
+     - '${GRAFANA_PORT}:3000'
+    networks: 
+      - internal
+      - default
+    restart: always
+  postgres:
+    container_name: ${INSTANCE_CONTAINER_PGNAME}
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PW}
+      - POSTGRES_DB=${POSTGRES_DB} #optional (specify default database instead of $POSTGRES_DB)
+    ports:
+      - "${POSTGRES_DBPORT}:5432"
+    networks: 
+      - internal
+      - postgresqlnetwork
+    restart: always
+
+networks:
+  default:
+  internal:
+    internal: true
+  postgresqlnetwork:
+    external: true
+    name: pgadminnetwork
+
